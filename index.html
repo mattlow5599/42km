@@ -15,7 +15,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#FBFAF4; --grid:#E4EBF2; --ink:#26345C; --pencil:#566; --faint:#9a9a93;
+    --paper:#FBFAF4; --grid:#E4EBF2; --ink:#26345C; --pencil:#556666; --faint:#6b6b64;
     --hi:#FFE45C; --red:#D2453B; --redline:#E7B6AE; --shadow:#cdd6e6; --green:#2f9e6e;
     --head:'Archivo',system-ui,sans-serif; --body:'Inter',system-ui,sans-serif;
     --nav-h:60px;
@@ -110,7 +110,7 @@
   input,select,textarea{width:100%;font-family:var(--body);font-size:.92rem;color:var(--ink);
     background:#fff;border:1.5px solid var(--ink);border-radius:4px;padding:9px 10px}
   textarea{resize:vertical;min-height:54px}
-  input:focus,select,textarea:focus{outline:none;box-shadow:2px 2px 0 var(--hi)}
+  input:focus,select:focus,textarea:focus{outline:none;box-shadow:2px 2px 0 var(--hi)}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .seg{display:flex;gap:0;border:1.5px solid var(--ink);border-radius:4px;overflow:hidden}
   .seg button{flex:1;background:#fff;border:none;border-right:1.5px solid var(--ink);padding:9px 4px;font-family:var(--head);font-weight:700;font-size:.8rem;color:var(--pencil);cursor:pointer}
@@ -177,23 +177,46 @@
     padding-bottom:env(safe-area-inset-bottom);background:#fff;border-top:1.5px solid var(--ink);display:flex}
   .tabbtn{flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
     font-weight:700;font-size:.62rem;text-transform:uppercase;letter-spacing:.3px;color:var(--faint)}
-  .tabbtn .ic{font-size:1.15rem;line-height:1}
+  .tabbtn .ic{font-size:1.15rem;line-height:1;display:flex;align-items:center;justify-content:center}
   .tabbtn.on{color:var(--ink)}
   .tabbtn.on .ic{transform:translateY(-1px)}
   .save-toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 18px);transform:translateX(-50%) translateY(20px);
     background:var(--ink);color:#fff;font-family:var(--head);font-weight:700;font-size:.82rem;padding:9px 16px;border-radius:30px;
     opacity:0;transition:.3s;z-index:50;pointer-events:none}
   .save-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* skip link */
+  .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+  .skip-link:focus{position:fixed;left:16px;top:8px;width:auto;height:auto;padding:8px 14px;background:var(--ink);color:#fff;font-family:var(--head);font-weight:700;font-size:.85rem;border-radius:4px;z-index:100;overflow:visible;outline:3px solid var(--hi)}
+
+  /* focus-visible */
+  .tabbtn:focus-visible{outline:3px solid var(--hi);outline-offset:-2px}
+  .btn:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+  summary:focus-visible{outline:3px solid var(--hi);outline-offset:2px;border-radius:5px}
+  .ck:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+  .seg button:focus-visible{outline:3px solid var(--hi);outline-offset:-3px}
+
+  /* touch targets & interactions */
+  .tabbtn,.btn,summary,.seg button,label.day.go,.rdel{touch-action:manipulation}
+  .btn,.seg button{min-height:44px}
+
+  /* reduced motion */
+  @media(prefers-reduced-motion:reduce){
+    section.tab{animation:none}
+    .bar i,.btn:active,.save-toast{transition:none}
+  }
 </style>
 </head>
 <body>
 
-<div class="top"><div class="row">
-  <div class="title">42.195 <span>Log</span></div>
-  <div class="cd"><b id="cdDays">—</b> days to race</div>
-</div></div>
+<a class="skip-link" href="#main">Skip to main content</a>
 
-<div class="wrap">
+<header class="top" role="banner"><div class="row">
+  <h1 class="title">42.195 <span>Log</span></h1>
+  <div class="cd" aria-label="Countdown to race"><b id="cdDays">—</b> days to race</div>
+</div></header>
+
+<div class="wrap" id="main" role="main">
 
   <!-- ============ PLAN ============ -->
   <section class="tab on" id="tab-plan">
@@ -245,7 +268,7 @@
       <div class="grid2">
         <div class="field"><label>Time (mm:ss)</label><input type="text" id="fTime" inputmode="numeric" placeholder="19:08"></div>
         <div class="field"><label>Avg / Max HR</label>
-          <div class="grid2"><input type="number" id="fHrAvg" inputmode="numeric" placeholder="avg"><input type="number" id="fHrMax" inputmode="numeric" placeholder="max"></div>
+          <div class="grid2"><input type="number" id="fHrAvg" inputmode="numeric" placeholder="avg" aria-label="Average heart rate"><input type="number" id="fHrMax" inputmode="numeric" placeholder="max" aria-label="Maximum heart rate"></div>
         </div>
       </div>
       <div class="pacepreview" id="pacePrev">pace —</div>
@@ -393,13 +416,21 @@
 
 </div>
 
-<nav class="nav">
-  <button class="tabbtn on" data-tab="plan"><span class="ic">🗓️</span>Plan</button>
-  <button class="tabbtn" data-tab="log"><span class="ic">✎</span>Log</button>
-  <button class="tabbtn" data-tab="stats"><span class="ic">📈</span>Stats</button>
-  <button class="tabbtn" data-tab="guide"><span class="ic">📖</span>Guide</button>
+<nav class="nav" aria-label="Main navigation">
+  <button class="tabbtn on" data-tab="plan" aria-current="page" aria-label="Plan">
+    <span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Plan
+  </button>
+  <button class="tabbtn" data-tab="log" aria-current="false" aria-label="Log">
+    <span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>Log
+  </button>
+  <button class="tabbtn" data-tab="stats" aria-current="false" aria-label="Stats">
+    <span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span>Stats
+  </button>
+  <button class="tabbtn" data-tab="guide" aria-current="false" aria-label="Guide">
+    <span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>Guide
+  </button>
 </nav>
-<div class="save-toast" id="toast">Saved ✓</div>
+<div class="save-toast" id="toast" role="status" aria-live="polite" aria-atomic="true">Saved ✓</div>
 
 <script>
 const RACE=new Date('2026-12-06T04:30:00+08:00');
@@ -511,7 +542,7 @@ function buildSessionOptions(){
 let feel='easy';
 function renderRuns(){
   const root=document.getElementById('runList');
-  if(!runs.length){root.innerHTML='<div class="empty">No runs logged yet. Add your first one above 👆</div>';return;}
+  if(!runs.length){root.innerHTML='<div class="empty">No runs logged yet — add your first one above.</div>';return;}
   const sorted=[...runs].sort((a,b)=>(b.date+b.id).localeCompare(a.date+a.id));
   root.innerHTML=sorted.map(r=>{
     const pace=r.km>0?fmtPace(r.timeSec/r.km):'—';
@@ -520,7 +551,7 @@ function renderRuns(){
     const feelP=r.feel?`<span class="pill feel-${r.feel}">${r.feel}</span>`:'';
     const rpe=r.rpe?`<span class="pill">RPE ${r.rpe}</span>`:'';
     const tag=r.tag?`· ${r.tag}`:'';
-    return `<div class="run"><div class="rt"><span class="rdate">${dstr}</span><span class="rtag">${tag}</span><button class="rdel" data-id="${r.id}" title="Delete">✕</button></div>
+    return `<div class="run"><div class="rt"><span class="rdate">${dstr}</span><span class="rtag">${tag}</span><button class="rdel" data-id="${r.id}" aria-label="Delete run from ${dstr}">✕</button></div>
       <div class="rmetrics"><span class="pill km">${r.km.toFixed(2)} km</span><span class="pill pace">${pace}</span>${hr}${rpe}${feelP}</div>
       ${r.notes?`<div class="rnote2">${r.notes.replace(/</g,'&lt;')}</div>`:''}</div>`;
   }).join('');
@@ -587,7 +618,7 @@ function importData(file){const fr=new FileReader();fr.onload=()=>{try{const o=J
 /* ---------- misc ---------- */
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1600);}
 function tickCountdown(){const d=Math.max(0,Math.ceil((RACE-new Date())/86400000));document.getElementById('cdDays').textContent=d;}
-function switchTab(name){document.querySelectorAll('.tab').forEach(s=>s.classList.toggle('on',s.id==='tab-'+name));document.querySelectorAll('.tabbtn').forEach(b=>b.classList.toggle('on',b.dataset.tab===name));window.scrollTo(0,0);}
+function switchTab(name){document.querySelectorAll('.tab').forEach(s=>s.classList.toggle('on',s.id==='tab-'+name));document.querySelectorAll('.tabbtn').forEach(b=>{const active=b.dataset.tab===name;b.classList.toggle('on',active);b.setAttribute('aria-current',active?'page':'false');});window.scrollTo(0,0);}
 
 function drawRWViz(){const host=document.getElementById('rwViz');if(!host)return;const u=14;let h='';for(let i=0;i<3;i++)h+=`<span class="rw-jog" style="width:${u*4}px"></span><span class="rw-walk" style="width:${u}px"></span>`;host.innerHTML=h;}
 function drawChart(){
